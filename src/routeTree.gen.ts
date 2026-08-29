@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalyzeRouteImport } from './routes/analyze'
+import { Route as EWasteGuideRouteImport } from './routes/e-waste-guide'
+import { Route as ResultsRouteImport } from './routes/results'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,49 @@ const AnalyzeRoute = AnalyzeRouteImport.update({
   path: '/analyze',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EWasteGuideRoute = EWasteGuideRouteImport.update({
+  id: '/e-waste-guide',
+  path: '/e-waste-guide',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResultsRoute = ResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analyze': typeof AnalyzeRoute
+  '/e-waste-guide': typeof EWasteGuideRoute
+  '/results': typeof ResultsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/analyze': typeof AnalyzeRoute
+  '/e-waste-guide': typeof EWasteGuideRoute
+  '/results': typeof ResultsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/analyze': typeof AnalyzeRoute
+  '/e-waste-guide': typeof EWasteGuideRoute
+  '/results': typeof ResultsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analyze'
+  fullPaths: '/' | '/analyze' | '/e-waste-guide' | '/results'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analyze'
-  id: '__root__' | '/' | '/analyze'
+  to: '/' | '/analyze' | '/e-waste-guide' | '/results'
+  id: '__root__' | '/' | '/analyze' | '/e-waste-guide' | '/results'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalyzeRoute: typeof AnalyzeRoute
+  EWasteGuideRoute: typeof EWasteGuideRoute
+  ResultsRoute: typeof ResultsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalyzeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/e-waste-guide': {
+      id: '/e-waste-guide'
+      path: '/e-waste-guide'
+      fullPath: '/e-waste-guide'
+      preLoaderRoute: typeof EWasteGuideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalyzeRoute: AnalyzeRoute,
+  EWasteGuideRoute: EWasteGuideRoute,
+  ResultsRoute: ResultsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
