@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AnalyzeRouteImport } from './routes/analyze'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EWasteGuideRouteImport } from './routes/e-waste-guide'
 import { Route as ResultsRouteImport } from './routes/results'
 
@@ -19,9 +21,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnalyzeRoute = AnalyzeRouteImport.update({
   id: '/analyze',
   path: '/analyze',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EWasteGuideRoute = EWasteGuideRouteImport.update({
@@ -37,34 +49,50 @@ const ResultsRoute = ResultsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/analyze': typeof AnalyzeRoute
+  '/dashboard': typeof DashboardRoute
   '/e-waste-guide': typeof EWasteGuideRoute
   '/results': typeof ResultsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/analyze': typeof AnalyzeRoute
+  '/dashboard': typeof DashboardRoute
   '/e-waste-guide': typeof EWasteGuideRoute
   '/results': typeof ResultsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/analyze': typeof AnalyzeRoute
+  '/dashboard': typeof DashboardRoute
   '/e-waste-guide': typeof EWasteGuideRoute
   '/results': typeof ResultsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analyze' | '/e-waste-guide' | '/results'
+  fullPaths:
+    '/' | '/about' | '/analyze' | '/dashboard' | '/e-waste-guide' | '/results'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analyze' | '/e-waste-guide' | '/results'
-  id: '__root__' | '/' | '/analyze' | '/e-waste-guide' | '/results'
+  to: '/' | '/about' | '/analyze' | '/dashboard' | '/e-waste-guide' | '/results'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/analyze'
+    | '/dashboard'
+    | '/e-waste-guide'
+    | '/results'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AnalyzeRoute: typeof AnalyzeRoute
+  DashboardRoute: typeof DashboardRoute
   EWasteGuideRoute: typeof EWasteGuideRoute
   ResultsRoute: typeof ResultsRoute
 }
@@ -78,11 +106,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/analyze': {
       id: '/analyze'
       path: '/analyze'
       fullPath: '/analyze'
       preLoaderRoute: typeof AnalyzeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/e-waste-guide': {
@@ -104,7 +146,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AnalyzeRoute: AnalyzeRoute,
+  DashboardRoute: DashboardRoute,
   EWasteGuideRoute: EWasteGuideRoute,
   ResultsRoute: ResultsRoute,
 }
