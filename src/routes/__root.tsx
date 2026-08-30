@@ -77,11 +77,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "EcoLife — Smart Gadget Lifespan & E-Waste Advisor" },
+      {
+        name: "description",
+        content:
+          "Predict your gadget's remaining lifespan, monitor its health and get smart e-waste recommendations.",
+      },
+      { property: "og:title", content: "EcoLife — Smart Gadget Lifespan & E-Waste Advisor" },
+      {
+        property: "og:description",
+        content: "Know your gadget. Extend its life. Reduce e-waste.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
