@@ -18,15 +18,15 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
-        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 lg:flex lg:justify-between">
+        <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 lg:flex lg:justify-between">
           <Link to="/" className="flex min-w-0 items-center gap-2">
             <span className="grid size-9 shrink-0 place-items-center rounded-xl eco-gradient text-primary-foreground">
               <Leaf className="size-5" />
             </span>
             <span className="min-w-0">
-              <span className="block truncate text-base font-semibold tracking-tight">EcoLife</span>
+              <span className="block truncate text-base font-semibold tracking-tight">Gadget Guardian</span>
               <span className="block truncate text-[11px] text-muted-foreground">
-                Gadget Lifespan &amp; E-Waste Advisor
+                Smart E-Waste Management &amp; Gadget Lifespan Prediction
               </span>
             </span>
           </Link>
@@ -78,8 +78,8 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-border bg-surface">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-medium text-foreground">EcoLife — Smart Gadget Lifespan &amp; E-Waste Advisor</p>
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-medium text-foreground">Gadget Guardian — Smart E-Waste Management and Gadget Lifespan Prediction System</p>
           <p>Machine learning powered sustainability project · Multiple Linear Regression</p>
         </div>
       </footer>

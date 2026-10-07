@@ -17,13 +17,13 @@ import { clearHistory, getHistory, type AnalysisRecord } from "@/services/histor
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Your Gadget Dashboard — EcoLife" },
+      { title: "Your Gadget Dashboard — Gadget Guardian" },
       {
         name: "description",
         content: "Review previously analyzed gadgets with their health scores, predicted lifespan and e-waste recommendation.",
       },
-      { property: "og:title", content: "Your Gadget Dashboard — EcoLife" },
-      { property: "og:description", content: "A history of every device you have analyzed with EcoLife." },
+      { property: "og:title", content: "Your Gadget Dashboard — Gadget Guardian" },
+      { property: "og:description", content: "A history of every device you have analyzed with Gadget Guardian." },
     ],
   }),
   component: DashboardPage,
@@ -44,7 +44,7 @@ function DashboardPage() {
 
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-6xl px-4 py-12">
+      <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:justify-between">
           <div className="min-w-0">
             <h1 className="truncate text-3xl font-bold tracking-tight sm:text-4xl">Your dashboard</h1>

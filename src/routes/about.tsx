@@ -6,13 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About the Project — EcoLife" },
+      { title: "About the Project — Gadget Guardian" },
       {
         name: "description",
-        content: "Problem statement, objectives, the multiple linear regression model, input features and technology stack behind EcoLife.",
+        content: "Problem statement, objectives, the multiple linear regression model, input features and technology stack behind Gadget Guardian.",
       },
-      { property: "og:title", content: "About the Project — EcoLife" },
-      { property: "og:description", content: "How EcoLife predicts gadget lifespan with multiple linear regression." },
+      { property: "og:title", content: "About the Project — Gadget Guardian" },
+      { property: "og:description", content: "How Gadget Guardian predicts gadget lifespan with multiple linear regression." },
     ],
   }),
   component: AboutPage,
@@ -37,18 +37,18 @@ const features = [
 
 const tech = [
   { group: "Frontend", items: ["React 19", "TanStack Router", "Tailwind CSS", "Recharts", "Lucide Icons"] },
-  { group: "Backend (planned)", items: ["Python", "Flask / FastAPI", "REST endpoint POST /predict"] },
-  { group: "Machine Learning", items: ["scikit-learn", "pandas", "NumPy", "Multiple Linear Regression"] },
+  { group: "Backend", items: ["Python 3.11", "Flask", "REST endpoint POST /predict"] },
+  { group: "Machine Learning", items: ["scikit-learn 1.6.1", "pandas 2.2.3", "NumPy", "Multiple Linear Regression"] },
 ];
 
 function AboutPage() {
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-5xl space-y-6 px-4 py-12">
+      <div className="mx-auto max-w-7xl space-y-6 px-4 py-12">
         <header>
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">About the project</h1>
           <p className="mt-3 max-w-3xl text-muted-foreground">
-            EcoLife is an engineering project that applies supervised machine learning to a sustainability problem: how
+            Gadget Guardian is an engineering project that applies supervised machine learning to a sustainability problem: how
             long an electronic device can realistically keep serving its owner, and what should happen to it afterwards.
           </p>
         </header>
@@ -100,8 +100,7 @@ function AboutPage() {
             <p>
               The model is trained offline in Python and served through a REST endpoint. The frontend only sends the form
               payload to <code className="rounded bg-surface px-1.5 py-0.5 text-foreground">POST /predict</code> and
-              renders the response, so the ML logic can evolve without touching the interface. Until the backend is
-              connected, the API service layer returns a mock response of the same shape.
+              renders the response, so the ML logic can evolve without touching the interface.
             </p>
           </CardContent>
         </Card>
@@ -131,7 +130,7 @@ function AboutPage() {
           </CardHeader>
           <CardContent className="text-sm leading-relaxed text-muted-foreground">
             Extending the working life of a device is the single most effective way to reduce its lifetime carbon
-            footprint, because most emissions occur during manufacturing. EcoLife encourages that extension first, and
+            footprint, because most emissions occur during manufacturing. Gadget Guardian encourages that extension first, and
             only recommends recycling once repair, refurbishment, donation, resale and part recovery are genuinely
             exhausted.
           </CardContent>

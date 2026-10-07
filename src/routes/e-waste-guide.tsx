@@ -16,12 +16,12 @@ import { Card, CardContent } from "@/components/ui/card";
 export const Route = createFileRoute("/e-waste-guide")({
   head: () => ({
     meta: [
-      { title: "E-Waste Guide — Reuse, Repair, Refurbish, Recycle | EcoLife" },
+      { title: "E-Waste Guide — Reuse, Repair, Refurbish, Recycle | Gadget Guardian" },
       {
         name: "description",
         content: "Practical guidance on reusing, repairing, refurbishing, donating, reselling, recovering parts and safely recycling electronics.",
       },
-      { property: "og:title", content: "E-Waste Guide — EcoLife" },
+      { property: "og:title", content: "E-Waste Guide — Gadget Guardian" },
       { property: "og:description", content: "The waste hierarchy for electronics: reuse, repair, refurbish, recycle, dispose." },
     ],
   }),
@@ -45,7 +45,7 @@ function GuidePage() {
   return (
     <SiteLayout>
       <section className="eco-soft border-b border-border">
-        <div className="mx-auto max-w-6xl px-4 py-14">
+        <div className="mx-auto max-w-7xl px-4 py-14">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">E-Waste Guide</h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
             Every option below keeps material out of landfill. The higher up the hierarchy you can act, the more energy,
@@ -74,7 +74,7 @@ function GuidePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-14">
+      <section className="mx-auto max-w-7xl px-4 py-14">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {options.map((o) => (
             <Card key={o.title} className="rounded-2xl shadow-card transition-shadow hover:shadow-soft">

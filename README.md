@@ -1,6 +1,6 @@
 # Gadget Guardian
 
-Create a modern responsive web application called "EcoLife – Smart Gadget Lifespan & E-Waste Advisor".
+Smart E-Waste Management and Gadget Lifespan Prediction System
 
 Purpose:
 
