@@ -28,12 +28,12 @@ import { getLastAnalysis, type AnalysisRecord } from "@/services/historyStore";
 export const Route = createFileRoute("/results")({
   head: () => ({
     meta: [
-      { title: "Gadget Health Report — EcoLife" },
+      { title: "Gadget Health Report — Gadget Guardian" },
       {
         name: "description",
         content: "Predicted remaining lifespan, health score, risk factors and e-waste recommendation for your device.",
       },
-      { property: "og:title", content: "Gadget Health Report — EcoLife" },
+      { property: "og:title", content: "Gadget Health Report — Gadget Guardian" },
       { property: "og:description", content: "See your device's health score, risks and the most sustainable next step." },
     ],
   }),
@@ -132,7 +132,7 @@ function ResultsPage() {
     setReady(true);
   }, []);
 
-  if (!ready) return <SiteLayout><div className="mx-auto max-w-6xl px-4 py-20" /></SiteLayout>;
+  if (!ready) return <SiteLayout><div className="mx-auto max-w-7xl px-4 py-20" /></SiteLayout>;
 
   if (!record) {
     return (
@@ -157,7 +157,7 @@ function ResultsPage() {
 
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-6xl space-y-8 px-4 py-12">
+      <div className="mx-auto max-w-7xl space-y-8 px-4 py-12">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:justify-between">
           <div className="min-w-0">
             <h1 className="truncate text-3xl font-bold tracking-tight sm:text-4xl">{r.gadget_type} health report</h1>

@@ -19,17 +19,15 @@ import { Card, CardContent } from "@/components/ui/card";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EcoLife — Smart Gadget Lifespan & E-Waste Advisor" },
+      { title: "Gadget Guardian — Smart E-Waste Management and Gadget Lifespan Prediction System" },
       {
         name: "description",
         content:
           "Predict how many months your laptop, phone, tablet or smartwatch has left, get maintenance advice and a smart e-waste decision.",
       },
-      { property: "og:title", content: "EcoLife — Smart Gadget Lifespan & E-Waste Advisor" },
+      { property: "og:title", content: "Gadget Guardian — Smart E-Waste Management and Gadget Lifespan Prediction System" },
       {
-        property: "og:description",
-        content: "Know your gadget. Extend its life. Reduce e-waste — powered by a machine learning lifespan model.",
-      },
+        property: "og:description", content: "Know your gadget. Extend its life. Reduce e-waste — powered by a machine learning lifespan model." },
     ],
   }),
   component: Home,
@@ -76,7 +74,7 @@ function Home() {
   return (
     <SiteLayout>
       <section className="eco-soft border-b border-border">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:py-24 lg:grid-cols-[1.15fr_1fr] lg:items-center">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:py-24 lg:grid-cols-[1.15fr_1fr] lg:items-center">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-medium text-muted-foreground">
               <Leaf className="size-3.5 text-primary" /> Sustainable electronics, measured
@@ -89,7 +87,7 @@ function Home() {
               <span className="text-primary">Reduce E-Waste.</span>
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground">
-              EcoLife collects fourteen measurable signals about your device — age, daily usage, battery health, charge
+              Gadget Guardian collects fourteen measurable signals about your device — age, daily usage, battery health, charge
               cycles, heat, physical condition and more — and feeds them to a multiple linear regression model. You get a
               predicted remaining lifespan, a health score and a responsible end-of-life recommendation.
             </p>
@@ -142,8 +140,8 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16">
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">What EcoLife does</h2>
+      <section className="mx-auto max-w-7xl px-4 py-16">
+        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">What Gadget Guardian does</h2>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((f) => (
             <Card key={f.title} className="rounded-2xl border-border/70 shadow-card transition-shadow hover:shadow-soft">
@@ -160,7 +158,7 @@ function Home() {
       </section>
 
       <section className="border-y border-border bg-surface">
-        <div className="mx-auto max-w-6xl px-4 py-14">
+        <div className="mx-auto max-w-7xl px-4 py-14">
           <div className="flex items-center gap-2 text-primary">
             <Globe2 className="size-5" />
             <h2 className="text-sm font-semibold uppercase tracking-wider">Sustainability snapshot</h2>
@@ -176,7 +174,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16">
+      <section className="mx-auto max-w-7xl px-4 py-16">
         <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">How it works</h2>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, idx) => (

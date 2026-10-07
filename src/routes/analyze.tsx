@@ -23,12 +23,12 @@ import { saveAnalysis } from "@/services/historyStore";
 export const Route = createFileRoute("/analyze")({
   head: () => ({
     meta: [
-      { title: "Analyze Your Gadget — EcoLife" },
+      { title: "Analyze Your Gadget — Gadget Guardian" },
       {
         name: "description",
         content: "Enter age, usage, battery health and condition details to get an ML-based lifespan prediction.",
       },
-      { property: "og:title", content: "Analyze Your Gadget — EcoLife" },
+      { property: "og:title", content: "Analyze Your Gadget — Gadget Guardian" },
       { property: "og:description", content: "Fourteen inputs, one health report and a smart e-waste decision." },
     ],
   }),
@@ -167,7 +167,7 @@ function AnalyzePage() {
 
   return (
     <SiteLayout>
-      <div className="mx-auto max-w-4xl px-4 py-12">
+      <div className="mx-auto max-w-5xl px-4 py-12">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Analyze your gadget</h1>
         <p className="mt-3 max-w-2xl text-muted-foreground">
           Fill in what you know about the device. Every field maps to an input feature of the prediction model — the more

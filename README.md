@@ -1,208 +1,214 @@
-# Gadget Guardian
+# 🛡️ Gadget Guardian
 
-Create a modern responsive web application called "EcoLife – Smart Gadget Lifespan & E-Waste Advisor".
+### Smart E-Waste Management and Gadget Lifespan Prediction System Using Machine Learning
 
-Purpose:
+Gadget Guardian is a machine-learning-powered web application designed to help users understand the health and remaining lifespan of their electronic gadgets and make responsible e-waste management decisions.
 
-The application predicts the remaining useful lifespan of electronic gadgets using a machine learning model and gives recommendations to improve gadget health and reduce e-waste.
+The system analyzes gadget condition, usage patterns, battery health, performance, maintenance, and environmental factors to predict the **remaining lifespan of a gadget in months**.
 
-Design:
+It also provides:
 
-Use a clean eco-tech theme with white, dark green, teal and soft gray colors.
+- 📊 Gadget health score
+- ⏳ Remaining lifespan prediction
+- ⚠️ Risk factors
+- 🔧 Maintenance recommendations
+- 💡 Lifespan extension tips
+- ♻️ E-waste management recommendations
 
-The UI should feel modern, professional and suitable for a college engineering project.
+---
 
-Use cards, icons, progress bars, gauges and clean charts.
+## 🚀 Features
 
-Make the website responsive for desktop and mobile.
+### 🔮 Lifespan Prediction
 
-Pages:
+Predicts the remaining useful lifespan of a gadget using a **Multiple Linear Regression** machine learning model.
 
-1. Home Page
+The system considers factors such as:
 
-- Hero section with title:
+- Gadget type
+- Age
+- Daily usage
+- Battery health
+- Charge cycles
+- Overheating
+- Physical condition
+- Maintenance frequency
+- Repair count
+- Performance score
+- Storage usage
+- Software updates
+- Environmental stress
+- Expected gadget life
 
-  "Know Your Gadget. Extend Its Life. Reduce E-Waste."
+### ❤️ Gadget Health Score
 
-- Short explanation of how the system works.
+Gadget Guardian calculates a health score from **0–100** using multiple condition indicators.
 
-- Button: "Analyze My Gadget"
+The score considers:
 
-- Cards explaining:
+- Battery health
+- Performance
+- Physical condition
+- Maintenance
+- Temperature/overheating condition
 
-  Predict Lifespan
+Health categories:
 
-  Monitor Gadget Health
+| Score | Category |
+|---|---|
+| 80–100 | Excellent |
+| 60–79 | Good |
+| 40–59 | Moderate |
+| 20–39 | Poor |
+| Below 20 | Critical |
 
-  Get Maintenance Advice
+### ⚠️ Risk Analysis
 
-  Reduce E-Waste
+The system identifies potential problems such as:
 
-- Add a small sustainability/e-waste statistics section.
+- Poor battery health
+- Excessive overheating
+- High storage usage
+- Low performance
+- Poor maintenance
+- Frequent repairs
+- Outdated software
 
-- Add "How It Works" with 4 steps:
+### 🔧 Maintenance Recommendations
 
-  Enter Gadget Details → AI Analysis → Health Report → Smart E-Waste Decision.
+Users receive personalized recommendations based on their gadget's condition.
 
-2. Analyze Gadget Page
+Examples include:
 
-Create a professional form containing:
+- Battery replacement
+- Cleaning cooling vents
+- Reducing heavy usage
+- Freeing storage
+- Software updates
+- Preventive maintenance
+- Professional inspection
 
-- Gadget Type dropdown: Laptop, Smartphone, Tablet, Smartwatch
+### ♻️ E-Waste Recommendations
 
-- Age in Years
+The system promotes responsible e-waste management using the following hierarchy:
 
-- Daily Usage Hours
+**Reuse → Repair → Refurbish → Recycle → Disposal**
 
-- Battery Health Percentage
+Depending on the gadget's remaining lifespan and condition, the system may recommend:
 
-- Charge Cycles
-
-- Overheating Level from 1 to 5
-
-- Physical Condition from 1 to 5
-
-- Maintenance Frequency from 1 to 5
-
-- Repair Count
-
-- Performance Score from 0 to 100
-
-- Storage Used Percentage
-
-- Software Updated: Yes/No
-
-- Environmental Stress from 1 to 5
-
-- Expected Life in Months
-
-Use sliders where appropriate.
-
-Add validation and explanations for rating scales.
-
-Button: "Analyze Gadget Health"
-
-3. Results Dashboard
-
-Display:
-
-- Gadget Type
-
-- Predicted Remaining Lifespan in months and years
-
-- Gadget Health Score out of 100
-
-- Health Category: Excellent / Good / Moderate / Poor / Critical
-
-- Progress bar or circular gauge
-
-- Risk factor cards
-
-- Maintenance recommendations
-
-- Ways to extend device lifespan
-
-- Final E-Waste Recommendation
-
-Possible e-waste recommendations:
-
-Continue Using
-
-Repair / Maintain
-
-Refurbish / Reuse
-
-Donate / Resell
-
-Reuse for Parts
-
-Authorized E-Waste Recycling
-
-Add a section titled "Why this recommendation?" explaining the main factors responsible for the result.
-
-4. E-Waste Guide Page
-
-Explain:
-
-- Reuse
-
-- Repair
-
+- Continue using
+- Repair and maintain
 - Refurbish
-
 - Donate
-
 - Resell
+- Reuse parts
+- Authorized e-waste recycling
 
-- Component Recovery
+---
 
-- Recycling
+# 🧠 Machine Learning
 
-- Safe disposal
+The project uses **Multiple Linear Regression** to predict:
 
-Show the preferred hierarchy:
+```text
+Remaining_Lifespan_Months
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+#### System Architecture
+                    ┌─────────────────────┐
+                    │       User          │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   Gadget Guardian   │
+                    │    Web Interface    │
+                    └──────────┬──────────┘
+                               │
+                               │ JSON Request
+                               ▼
+                    ┌─────────────────────┐
+                    │      Flask API      │
+                    │      /predict       │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Multiple Linear     │
+                    │ Regression Model    │
+                    │       (.pkl)        │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Prediction + Health │
+                    │ Risk + Maintenance  │
+                    │ + E-Waste Analysis  │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   Results Dashboard │
+                    └─────────────────────┘
 
-Reuse → Repair → Refurbish → Recycle → Disposal
 
-5. About Project Page
+🛠️ Technology Stack
+Frontend
+- React
+- TypeScript
+- TanStack Start
+- Vite
+- Tailwind CSS
+- Recharts
+Backend
+- Python
+- Flask
+- Flask-CORS
+Machine Learning
+- Scikit-learn
+- Pandas
+- NumPy
+- Joblib
+Development Tools
+- VS Code
+- Git
+- GitHub
+- Google Colab
 
-Include:
 
-- Problem Statement
+🎯 Project Objectives
+1. Predict the remaining lifespan of electronic gadgets.
+2. Estimate gadget health using multiple condition indicators.
+3. Identify factors that may reduce gadget lifespan.
+4. Provide personalized maintenance recommendations.
+5. Encourage users to extend gadget life.
+6. Promote responsible e-waste management.
+7. Demonstrate the practical application of machine learning in sustainability.
 
-- Project Objective
 
-- Machine Learning Model: Multiple Linear Regression
+🔮 Future Scope
+Possible future improvements include:
+- Real-world gadget datasets
+- More machine learning algorithms
+- Random Forest and XGBoost comparison
+- Time-series lifespan prediction
+- IoT-based gadget monitoring
+- Battery degradation prediction
+- Mobile application
+- User accounts and prediction history
+- Cloud deployment
+- E-waste collection center integration
+- Automated recycling-center recommendations
+- Personalized maintenance reminders
 
-- Input Features
 
-- Sustainability Objective
+⚠️ Limitations
+- The current dataset is synthetic.
+- Lifespan predictions are estimates and should not be treated as professional hardware diagnostics.
+- Gadget lifespan can vary significantly depending on manufacturer, components, usage patterns, and repair quality.
+- The current model uses Multiple Linear Regression and may not capture all nonlinear relationships.
 
-- Technologies Used
 
-6. Optional User Dashboard
-
-- Previous analyzed gadgets
-
-- Date analyzed
-
-- Health score
-
-- Predicted lifespan
-
-- Recommendation
-
-Important:
-
-Create the frontend in React.
-
-Keep API calls in a separate service file.
-
-Create an API function POST /predict that sends the gadget form data as JSON.
-
-For now, use mock prediction data so the interface works.
-
-Do not hardcode the final ML logic into the frontend because the real model will later be connected using a Python Flask or FastAPI backend.
-
-Make the design visually attractive and professional with good spacing, rounded cards, subtle shadows, charts and Lucide icons.
-
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/8b91a35e-8529-46cc-8578-f6bdd11aac2e).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+👩‍💻 Project
+Gadget Guardian
+Smart E-Waste Management and Gadget Lifespan Prediction System Using Machine Learning
+Developed as an academic machine learning and web application project.
