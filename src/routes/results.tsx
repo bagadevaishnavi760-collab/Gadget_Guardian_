@@ -4,11 +4,19 @@ import {
   AlertTriangle,
   ArrowRight,
   CalendarClock,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
   HeartPulse,
   Lightbulb,
+  Leaf,
   Recycle,
+  RefreshCw,
   ShieldCheck,
+  Sparkles,
+  TrendingUp,
   Wrench,
+  Zap,
 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { SiteLayout } from "@/components/SiteLayout";
@@ -46,6 +54,34 @@ const severityTone: Record<string, string> = {
   high: "bg-destructive/10 text-destructive",
 };
 
+const getContextualCallout = (recommendation: string): { icon: any; message: string; variant: string } => {
+  if (recommendation.includes("Continue Using")) {
+    return { icon: Sparkles, message: "Don't replace it yet!", variant: "success" };
+  }
+  if (recommendation.includes("Repair")) {
+    return { icon: Wrench, message: "Repair before replacing.", variant: "warning" };
+  }
+  if (recommendation.includes("Refurbish") || recommendation.includes("Reuse")) {
+    return { icon: RefreshCw, message: "Give your gadget a second life.", variant: "info" };
+  }
+  if (recommendation.includes("Recycle")) {
+    return { icon: Recycle, message: "Recycle responsibly.", variant: "eco" };
+  }
+  if (recommendation.includes("Donate") || recommendation.includes("Resell")) {
+    return { icon: HeartPulse, message: "Pass it on to someone who needs it.", variant: "success" };
+  }
+  return { icon: Leaf, message: "Make the sustainable choice.", variant: "eco" };
+};
+
+const getPriorityLabel = (index: number): { label: string; color: string } => {
+  const priorities = [
+    { label: "URGENT", color: "bg-destructive/10 text-destructive" },
+    { label: "HIGH", color: "bg-warning/15 text-warning" },
+    { label: "DO SOON", color: "bg-primary/10 text-primary" },
+  ];
+  return priorities[index] || priorities[2];
+};
+
 function Gauge({ score }: { score: number }) {
   const radius = 70;
   const circumference = Math.PI * radius;
@@ -78,6 +114,15 @@ function Gauge({ score }: { score: number }) {
   );
 }
 
+function BatteryIcon({ value }: { value: number }) {
+  const getColor = () => {
+    if (value >= 80) return "text-success";
+    if (value >= 50) return "text-warning";
+    return "text-destructive";
+  };
+  return <Zap className={`size-4 ${getColor()}`} />;
+}
+
 function ResultsPage() {
   const [record, setRecord] = useState<AnalysisRecord | null>(null);
   const [ready, setReady] = useState(false);
@@ -106,6 +151,9 @@ function ResultsPage() {
   }
 
   const r = record.result;
+
+  const contextualInfo = getContextualCallout(r.ewaste_recommendation);
+  const ContextIcon = contextualInfo.icon;
 
   return (
     <SiteLayout>
@@ -208,59 +256,155 @@ function ResultsPage() {
           </div>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-2">
-          <Card className="rounded-2xl shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Wrench className="size-4 text-primary" /> Maintenance recommendations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {r.maintenance_recommendations.map((m) => (
-                  <li key={m} className="flex gap-3 text-sm text-muted-foreground">
-                    <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-                    <span>{m}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+        <Card className="overflow-hidden rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-primary/[0.02] to-transparent shadow-soft">
+          <CardHeader className="border-b border-border/50 bg-primary/[0.03]">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
+                <Sparkles className="size-5" />
+              </span>
+              Your Gadget's Action Plan
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-muted-foreground">Health Status</span>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${categoryTone[r.health_category]}`}>
+                    {r.health_category}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-muted-foreground">Remaining Lifespan</span>
+                  <span className="text-sm font-semibold">{r.remaining_months} months ({r.remaining_years} years)</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-muted-foreground">Health Score</span>
+                  <span className="text-sm font-semibold">{r.health_score}/100</span>
+                </div>
+              </div>
+              <div className="flex flex-col justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">E-Waste Recommendation</p>
+                  <p className="mt-1 text-xl font-bold text-primary">{r.ewaste_recommendation}</p>
+                </div>
+                <div className={`flex items-center gap-2 rounded-xl px-4 py-3 ${
+                  contextualInfo.variant === "success" ? "bg-success/10 text-success" :
+                  contextualInfo.variant === "warning" ? "bg-warning/10 text-warning" :
+                  contextualInfo.variant === "eco" ? "bg-leaf/10 text-leaf" :
+                  "bg-primary/10 text-primary"
+                }`}>
+                  <ContextIcon className="size-5" />
+                  <span className="text-sm font-semibold">{contextualInfo.message}</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card className="rounded-2xl shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Lightbulb className="size-4 text-primary" /> Ways to extend device lifespan
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {r.lifespan_extension_tips.map((t) => (
-                  <li key={t} className="flex gap-3 text-sm text-muted-foreground">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+        <div>
+          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight">
+            <TrendingUp className="size-5 text-primary" /> Do These 3 Things First
+          </h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {r.maintenance_recommendations.slice(0, 3).map((rec, index) => {
+              const priority = getPriorityLabel(index);
+              const icons = [Zap, Wrench, ShieldCheck];
+              const Icon = icons[index];
+              return (
+                <Card key={rec} className="group relative overflow-hidden rounded-2xl border-2 border-primary/10 shadow-card transition-all hover:border-primary/30 hover:shadow-lg">
+                  <CardContent className="p-5">
+                    <div className="mb-3 flex items-center justify-between">
+                      <span className={`rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${priority.color}`}>
+                        {priority.label}
+                      </span>
+                      <span className="text-2xl font-bold text-primary/20">0{index + 1}</span>
+                    </div>
+                    <div className="mb-3 grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
+                      <Icon className="size-6" />
+                    </div>
+                    <p className="text-sm font-medium leading-relaxed">{rec}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
+
+        <Card className="rounded-2xl shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Lightbulb className="size-4 text-warning" /> Quick Wins
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {r.lifespan_extension_tips.map((tip, index) => (
+                <div
+                  key={tip}
+                  className="group flex items-start gap-3 rounded-xl border border-border/50 bg-surface/50 p-4 transition-all hover:border-primary/30 hover:bg-surface"
+                >
+                  <div className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <CheckCircle2 className="size-3" />
+                  </div>
+                  <span className="text-sm leading-relaxed text-muted-foreground group-hover:text-foreground transition-colors">{tip}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="rounded-2xl border-primary/25 bg-surface shadow-card">
           <CardHeader>
-            <CardTitle className="text-base">Why this recommendation?</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Leaf className="size-4 text-leaf" /> Why this recommendation?
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <ol className="space-y-3">
-              {r.reasoning.map((line, i) => (
-                <li key={line} className="flex gap-3 text-sm text-muted-foreground">
-                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                    {i + 1}
-                  </span>
-                  <span>{line}</span>
-                </li>
-              ))}
-            </ol>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:border-primary/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <BatteryIcon value={record.input.battery_health} />
+                  <span className="text-sm font-medium">Battery Health</span>
+                </div>
+                <p className="text-2xl font-bold text-primary">{record.input.battery_health}%</p>
+              </div>
+              <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:border-primary/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="size-4 text-warning" />
+                  <span className="text-sm font-medium">Performance</span>
+                </div>
+                <p className="text-2xl font-bold text-primary">{record.input.performance_score}/100</p>
+              </div>
+              <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:border-primary/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="size-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Age</span>
+                </div>
+                <p className="text-2xl font-bold text-primary">{record.input.age_years} years</p>
+              </div>
+              <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:border-primary/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <CalendarClock className="size-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Remaining Lifespan</span>
+                </div>
+                <p className="text-2xl font-bold text-primary">{r.remaining_months} months</p>
+              </div>
+              <div className="rounded-xl border border-border/50 bg-card p-4 transition-all hover:border-primary/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <HeartPulse className="size-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Health Score</span>
+                </div>
+                <p className="text-2xl font-bold text-primary">{r.health_score}/100</p>
+              </div>
+              <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 transition-all hover:border-primary/50">
+                <div className="flex items-center gap-2 mb-2">
+                  <Recycle className="size-4 text-primary" />
+                  <span className="text-sm font-medium">Final Recommendation</span>
+                </div>
+                <p className="text-lg font-bold text-primary leading-tight">{r.ewaste_recommendation}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

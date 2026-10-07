@@ -11,10 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EWasteGuideRouteImport } from './routes/e-waste-guide'
 import { Route as ResultsRouteImport } from './routes/results'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAnalysesRouteImport } from './routes/admin.analyses'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminEWasteRouteImport } from './routes/admin.e-waste'
+import { Route as AdminModelPerformanceRouteImport } from './routes/admin.model-performance'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalyzeRoute = AnalyzeRouteImport.update({
@@ -46,14 +57,45 @@ const ResultsRoute = ResultsRouteImport.update({
   path: '/results',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalysesRoute = AdminAnalysesRouteImport.update({
+  id: '/analyses',
+  path: '/analyses',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEWasteRoute = AdminEWasteRouteImport.update({
+  id: '/e-waste',
+  path: '/e-waste',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminModelPerformanceRoute = AdminModelPerformanceRouteImport.update({
+  id: '/model-performance',
+  path: '/model-performance',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/dashboard': typeof DashboardRoute
   '/e-waste-guide': typeof EWasteGuideRoute
   '/results': typeof ResultsRoute
+  '/admin/analyses': typeof AdminAnalysesRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/e-waste': typeof AdminEWasteRoute
+  '/admin/model-performance': typeof AdminModelPerformanceRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,35 +104,75 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/e-waste-guide': typeof EWasteGuideRoute
   '/results': typeof ResultsRoute
+  '/admin/analyses': typeof AdminAnalysesRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/e-waste': typeof AdminEWasteRoute
+  '/admin/model-performance': typeof AdminModelPerformanceRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/dashboard': typeof DashboardRoute
   '/e-waste-guide': typeof EWasteGuideRoute
   '/results': typeof ResultsRoute
+  '/admin/analyses': typeof AdminAnalysesRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/e-waste': typeof AdminEWasteRoute
+  '/admin/model-performance': typeof AdminModelPerformanceRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/about' | '/analyze' | '/dashboard' | '/e-waste-guide' | '/results'
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/analyze'
+    | '/dashboard'
+    | '/e-waste-guide'
+    | '/results'
+    | '/admin/analyses'
+    | '/admin/analytics'
+    | '/admin/e-waste'
+    | '/admin/model-performance'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/analyze' | '/dashboard' | '/e-waste-guide' | '/results'
-  id:
-    | '__root__'
+  to:
     | '/'
     | '/about'
     | '/analyze'
     | '/dashboard'
     | '/e-waste-guide'
     | '/results'
+    | '/admin/analyses'
+    | '/admin/analytics'
+    | '/admin/e-waste'
+    | '/admin/model-performance'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/analyze'
+    | '/dashboard'
+    | '/e-waste-guide'
+    | '/results'
+    | '/admin/analyses'
+    | '/admin/analytics'
+    | '/admin/e-waste'
+    | '/admin/model-performance'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AnalyzeRoute: typeof AnalyzeRoute
   DashboardRoute: typeof DashboardRoute
   EWasteGuideRoute: typeof EWasteGuideRoute
@@ -111,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analyze': {
@@ -141,12 +230,66 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analyses': {
+      id: '/admin/analyses'
+      path: '/analyses'
+      fullPath: '/admin/analyses'
+      preLoaderRoute: typeof AdminAnalysesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/e-waste': {
+      id: '/admin/e-waste'
+      path: '/e-waste'
+      fullPath: '/admin/e-waste'
+      preLoaderRoute: typeof AdminEWasteRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/model-performance': {
+      id: '/admin/model-performance'
+      path: '/model-performance'
+      fullPath: '/admin/model-performance'
+      preLoaderRoute: typeof AdminModelPerformanceRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAnalysesRoute: typeof AdminAnalysesRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminEWasteRoute: typeof AdminEWasteRoute
+  AdminModelPerformanceRoute: typeof AdminModelPerformanceRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalysesRoute: AdminAnalysesRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminEWasteRoute: AdminEWasteRoute,
+  AdminModelPerformanceRoute: AdminModelPerformanceRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
   AnalyzeRoute: AnalyzeRoute,
   DashboardRoute: DashboardRoute,
   EWasteGuideRoute: EWasteGuideRoute,
