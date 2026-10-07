@@ -34,7 +34,7 @@ function AdminModelPerformance() {
   ];
 
   return (
-    <div className="p-8">
+    <div className="mx-auto max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Model Performance</h1>
         <p className="mt-2 text-muted-foreground">
@@ -42,7 +42,7 @@ function AdminModelPerformance() {
         </p>
       </div>
 
-      <Card className="mb-6 rounded-2xl shadow-card">
+      <Card className="rounded-xl shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="size-5 text-primary" />
@@ -50,16 +50,16 @@ function AdminModelPerformance() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div>
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="border-l-2 border-primary pl-4">
               <p className="text-sm font-medium text-muted-foreground">Model Type</p>
               <p className="text-lg font-semibold">Multiple Linear Regression</p>
             </div>
-            <div>
+            <div className="border-l-2 border-teal pl-4">
               <p className="text-sm font-medium text-muted-foreground">Target Variable</p>
               <p className="text-lg font-semibold">Remaining_Lifespan_Months</p>
             </div>
-            <div>
+            <div className="border-l-2 border-leaf pl-4">
               <p className="text-sm font-medium text-muted-foreground">Model Library</p>
               <p className="text-lg font-semibold">scikit-learn (sklearn.pipeline.Pipeline)</p>
             </div>
@@ -67,7 +67,7 @@ function AdminModelPerformance() {
         </CardContent>
       </Card>
 
-      <Card className="mb-6 rounded-2xl shadow-card">
+      <Card className="rounded-xl shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="size-5 text-primary" />
@@ -76,29 +76,28 @@ function AdminModelPerformance() {
         </CardHeader>
         <CardContent>
           <div className="rounded-xl border border-border/50 bg-surface/50 p-6">
-            <p className="text-sm text-muted-foreground mb-4">
-              Model evaluation metrics (MAE, MSE, RMSE, R²) are not currently available in the database.
-              These metrics should be calculated during model training and stored for monitoring.
+            <p className="mb-4 text-sm text-muted-foreground">
+              The repository contains the trained model artifact but no evaluation report or holdout labels. Metrics are left unavailable rather than estimated from prediction requests.
             </p>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-lg border border-border bg-card p-4">
                 <p className="text-sm font-medium text-muted-foreground">MAE</p>
-                <p className="text-xl font-bold text-muted-foreground">N/A</p>
+                <p className="text-xl font-bold text-muted-foreground">Unavailable</p>
                 <p className="text-xs text-muted-foreground">Mean Absolute Error</p>
               </div>
               <div className="rounded-lg border border-border bg-card p-4">
                 <p className="text-sm font-medium text-muted-foreground">MSE</p>
-                <p className="text-xl font-bold text-muted-foreground">N/A</p>
+                <p className="text-xl font-bold text-muted-foreground">Unavailable</p>
                 <p className="text-xs text-muted-foreground">Mean Squared Error</p>
               </div>
               <div className="rounded-lg border border-border bg-card p-4">
                 <p className="text-sm font-medium text-muted-foreground">RMSE</p>
-                <p className="text-xl font-bold text-muted-foreground">N/A</p>
+                <p className="text-xl font-bold text-muted-foreground">Unavailable</p>
                 <p className="text-xs text-muted-foreground">Root Mean Squared Error</p>
               </div>
               <div className="rounded-lg border border-border bg-card p-4">
                 <p className="text-sm font-medium text-muted-foreground">R²</p>
-                <p className="text-xl font-bold text-muted-foreground">N/A</p>
+                <p className="text-xl font-bold text-muted-foreground">Unavailable</p>
                 <p className="text-xs text-muted-foreground">Coefficient of Determination</p>
               </div>
             </div>
@@ -106,7 +105,7 @@ function AdminModelPerformance() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl shadow-card">
+      <Card className="rounded-xl shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="size-5 text-primary" />
@@ -114,7 +113,7 @@ function AdminModelPerformance() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {modelFeatures.map((feature) => (
               <div
                 key={feature}

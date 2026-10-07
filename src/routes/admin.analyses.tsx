@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getAdminAnalyses, type AnalysisRecord } from "@/services/adminApi";
+import { getAllAdminAnalyses, type AnalysisRecord } from "@/services/adminApi";
 
 export const Route = createFileRoute("/admin/analyses")({
   head: () => ({
@@ -27,7 +27,6 @@ export const Route = createFileRoute("/admin/analyses")({
 
 function AdminAnalyses() {
   const [analyses, setAnalyses] = useState<AnalysisRecord[]>([]);
-  const [filteredAnalyses, setFilteredAnalyses] = useState<AnalysisRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,9 +38,8 @@ function AdminAnalyses() {
     async function loadAnalyses() {
       try {
         setLoading(true);
-        const data = await getAdminAnalyses(1000, 0);
-        setAnalyses(data.analyses);
-        setFilteredAnalyses(data.analyses);
+        const data = await getAllAdminAnalyses();
+        setAnalyses(data);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load analyses");
@@ -52,34 +50,23 @@ function AdminAnalyses() {
     loadAnalyses();
   }, []);
 
-  useEffect(() => {
-    let filtered = analyses;
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredAnalyses = analyses.filter((analysis) => {
+    const searchable = [
+      String(analysis.id),
+      analysis.input.gadget_type,
+      analysis.health_category,
+      analysis.ewaste_recommendation,
+    ].join(" ").toLowerCase();
+    return (
+      (!normalizedSearch || searchable.includes(normalizedSearch)) &&
+      (gadgetTypeFilter === "all" || analysis.input.gadget_type === gadgetTypeFilter) &&
+      (healthCategoryFilter === "all" || analysis.health_category === healthCategoryFilter) &&
+      (ewasteFilter === "all" || analysis.ewaste_recommendation === ewasteFilter)
+    );
+  });
 
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (a) =>
-          a.gadget_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          a.health_category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          a.ewaste_recommendation.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (gadgetTypeFilter !== "all") {
-      filtered = filtered.filter((a) => a.gadget_type === gadgetTypeFilter);
-    }
-
-    if (healthCategoryFilter !== "all") {
-      filtered = filtered.filter((a) => a.health_category === healthCategoryFilter);
-    }
-
-    if (ewasteFilter !== "all") {
-      filtered = filtered.filter((a) => a.ewaste_recommendation === ewasteFilter);
-    }
-
-    setFilteredAnalyses(filtered);
-  }, [searchTerm, gadgetTypeFilter, healthCategoryFilter, ewasteFilter, analyses]);
-
-  const gadgetTypes = Array.from(new Set(analyses.map((a) => a.gadget_type)));
+  const gadgetTypes = Array.from(new Set(analyses.map((a) => a.input.gadget_type)));
   const healthCategories = Array.from(new Set(analyses.map((a) => a.health_category)));
   const ewasteRecommendations = Array.from(new Set(analyses.map((a) => a.ewaste_recommendation)));
 
@@ -104,17 +91,15 @@ function AdminAnalyses() {
   }
 
   return (
-    <div className="p-8">
+    <div className="mx-auto max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Gadget Analyses</h1>
-        <p className="mt-2 text-muted-foreground">
-          View and search all gadget analysis records
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{analyses.length} records from the analysis database</p>
       </div>
 
-      <Card className="mb-6 rounded-2xl shadow-card">
-        <CardContent className="p-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <Card className="rounded-xl shadow-card">
+        <CardContent className="p-4 sm:p-5">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -170,7 +155,7 @@ function AdminAnalyses() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl shadow-card">
+      <Card className="rounded-xl shadow-card">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -206,8 +191,8 @@ function AdminAnalyses() {
                 {filteredAnalyses.map((analysis) => (
                   <tr key={analysis.id} className="hover:bg-surface/50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm">{analysis.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{analysis.gadget_type}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">{analysis.age_years} years</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{analysis.input.gadget_type}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">{analysis.input.age_years} years</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold">{analysis.health_score}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">{analysis.health_category}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">{analysis.remaining_months} months</td>
@@ -217,12 +202,16 @@ function AdminAnalyses() {
                     </td>
                   </tr>
                 ))}
+                {filteredAnalyses.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-12 text-center text-sm text-muted-foreground">
+                      {analyses.length ? "No records match these filters." : "No analyses have been recorded yet."}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
-          {filteredAnalyses.length === 0 && (
-            <div className="p-8 text-center text-muted-foreground">No analyses found</div>
-          )}
         </CardContent>
       </Card>
     </div>

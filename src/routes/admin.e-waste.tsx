@@ -66,53 +66,46 @@ function AdminEWaste() {
     );
   }
 
-  const ewasteData = Object.entries(analytics?.ewaste_recommendation_distribution || {}).map(
-    ([name, value]) => ({ name, value })
-  );
-
-  const total = analytics?.total_analyses || 0;
-
+  const recommendationCounts = analytics?.ewaste_recommendation_counts ?? {};
+  const total = Object.values(recommendationCounts).reduce((sum, count) => sum + count, 0);
   const recommendationCards = [
     {
       name: "Continue Using",
-      count: analytics?.ewaste_recommendation_distribution["Continue Using"] || 0,
+      count: recommendationCounts["Continue Using"] ?? 0,
       color: "bg-success/10 text-success",
-      description: "Device is in good condition and should continue to be used.",
+      description: "Continue using devices in healthy condition.",
     },
     {
-      name: "Repair / Maintain",
-      count: analytics?.ewaste_recommendation_distribution["Repair / Maintain"] || 0,
+      name: "Repair",
+      count: recommendationCounts["Repair / Maintain"] ?? 0,
       color: "bg-warning/10 text-warning",
-      description: "Device needs repairs but is worth maintaining.",
+      description: "Repair or maintain devices that remain serviceable.",
     },
     {
       name: "Refurbish / Reuse",
-      count: analytics?.ewaste_recommendation_distribution["Refurbish / Reuse"] || 0,
+      count: (recommendationCounts["Refurbish / Reuse"] ?? 0) + (recommendationCounts["Donate / Resell"] ?? 0),
       color: "bg-primary/10 text-primary",
-      description: "Device can be refurbished and given a second life.",
+      description: "Refurbish, donate, or resell for another useful life.",
     },
     {
-      name: "Donate / Resell",
-      count: analytics?.ewaste_recommendation_distribution["Donate / Resell"] || 0,
+      name: "Recycle",
+      count: (recommendationCounts["Reuse for Parts"] ?? 0) + (recommendationCounts["Authorized E-Waste Recycling"] ?? 0),
       color: "bg-teal/10 text-teal",
-      description: "Device can be donated or resold to someone who needs it.",
+      description: "Recover usable components or use authorized recycling.",
     },
     {
-      name: "Reuse for Parts",
-      count: analytics?.ewaste_recommendation_distribution["Reuse for Parts"] || 0,
-      color: "bg-accent/10 text-accent-foreground",
-      description: "Device components can be harvested for reuse.",
-    },
-    {
-      name: "Authorized E-Waste Recycling",
-      count: analytics?.ewaste_recommendation_distribution["Authorized E-Waste Recycling"] || 0,
-      color: "bg-destructive/10 text-destructive",
-      description: "Device should be recycled through authorized e-waste channels.",
+      name: "Disposal",
+      count: null,
+      color: "bg-muted text-muted-foreground",
+      description: "No separate disposal recommendation is recorded by the prediction API.",
     },
   ];
+  const ewasteData = recommendationCards
+    .filter((card): card is typeof card & { count: number } => card.count !== null)
+    .map(({ name, count }) => ({ name, count }));
 
   return (
-    <div className="p-8">
+    <div className="mx-auto max-w-[1600px] space-y-6 p-4 sm:p-6 lg:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">E-Waste Insights</h1>
         <p className="mt-2 text-muted-foreground">
@@ -120,16 +113,16 @@ function AdminEWaste() {
         </p>
       </div>
 
-      <Card className="mb-6 rounded-2xl shadow-card">
+      <Card className="rounded-xl shadow-card">
         <CardHeader>
           <CardTitle>E-Waste Recommendation Distribution</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={360}>
             <BarChart data={ewasteData} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-              <XAxis type="number" stroke="var(--color-muted-foreground)" />
-              <YAxis dataKey="name" type="category" width={200} stroke="var(--color-muted-foreground)" />
+              <XAxis type="number" allowDecimals={false} stroke="var(--color-muted-foreground)" />
+              <YAxis dataKey="name" type="category" width={145} stroke="var(--color-muted-foreground)" />
               <Tooltip
                 contentStyle={{
                   borderRadius: 12,
@@ -138,23 +131,28 @@ function AdminEWaste() {
                   color: "var(--color-card-foreground)",
                 }}
               />
-              <Bar dataKey="value" fill="var(--color-leaf)" radius={[0, 8, 8, 0]} />
+              <Bar dataKey="count" name="Analyses" fill="var(--color-leaf)" radius={[0, 5, 5, 0]} />
             </BarChart>
           </ResponsiveContainer>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Groups combine the database recommendations into five outcomes. Disposal is not charted because the prediction API does not record it separately.
+          </p>
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {recommendationCards.map((card) => (
-          <Card key={card.name} className="rounded-2xl shadow-card">
+          <Card key={card.name} className="rounded-xl shadow-card">
             <CardHeader>
               <CardTitle className="text-base">{card.name}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="mb-4">
-                <div className="text-3xl font-bold">{card.count}</div>
+                <div className="text-3xl font-bold">{card.count ?? "Not tracked"}</div>
                 <div className="text-sm text-muted-foreground">
-                  {total > 0 ? ((card.count / total) * 100).toFixed(1) : 0}% of total
+                    {card.count === null
+                      ? "No separate outcome in API"
+                      : `${total > 0 ? ((card.count / total) * 100).toFixed(1) : "0.0"}% of total`}
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">{card.description}</p>

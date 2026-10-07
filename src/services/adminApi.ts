@@ -2,8 +2,7 @@ const API_BASE_URL = import.meta.env["VITE_API_BASE_URL"] ?? "http://localhost:5
 
 export interface AdminStats {
   total_analyses: number;
-  average_health_score: number;
-  average_remaining_months: number;
+  average_health_score: number | null;
   gadget_type_counts: Record<string, number>;
   health_category_counts: Record<string, number>;
   ewaste_recommendation_counts: Record<string, number>;
@@ -11,62 +10,58 @@ export interface AdminStats {
 
 export interface AnalysisRecord {
   id: number;
-  gadget_type: string;
-  age_years: number;
-  daily_usage_hours: number;
-  battery_health: number;
-  charge_cycles: number;
-  overheating_level: number;
-  physical_condition: number;
-  maintenance_frequency: number;
-  repair_count: number;
-  performance_score: number;
-  storage_used: number;
-  software_updated: boolean;
-  environmental_stress: number;
-  expected_life_months: number;
+  created_at: string;
+  input: {
+    gadget_type: string;
+    age_years: number;
+    daily_usage_hours: number;
+    battery_health: number;
+    charge_cycles: number;
+    overheating_level: number;
+    physical_condition: number;
+    maintenance_frequency: number;
+    repair_count: number;
+    performance_score: number;
+    storage_used: number;
+    software_updated: boolean;
+    environmental_stress: number;
+    expected_life_months: number;
+  };
   remaining_months: number;
   remaining_years: number;
   health_score: number;
   health_category: string;
   ewaste_recommendation: string;
   model: string;
-  risk_factors: Array<{ label: string; severity: string; detail: string }>;
-  maintenance_recommendations: string[];
-  lifespan_extension_tips: string[];
-  reasoning: string[];
-  factor_breakdown: Array<{ factor: string; impact: number }>;
-  created_at: string;
+  result: {
+    gadget_type: string;
+    remaining_months: number;
+    remaining_years: number;
+    health_score: number;
+    health_category: string;
+    ewaste_recommendation: string;
+    model: string;
+  };
 }
 
 export interface AdminAnalytics {
-  total_analyses: number;
-  health_score_distribution: Record<string, number>;
-  remaining_lifespan_stats: {
-    min: number;
-    max: number;
-    avg: number;
-    median: number;
+  gadget_type_counts: Record<string, number>;
+  health_category_counts: Record<string, number>;
+  ewaste_recommendation_counts: Record<string, number>;
+  remaining_lifespan: {
+    count: number;
+    average_months: number | null;
+    median_months: number | null;
+    min_months: number | null;
+    max_months: number | null;
   };
-  health_category_distribution: Record<string, number>;
-  ewaste_recommendation_distribution: Record<string, number>;
-  gadget_type_distribution: Record<string, number>;
-  recent_analyses: Array<{
-    id: number;
-    gadget_type: string;
-    health_score: number;
-    health_category: string;
-    remaining_months: number;
-    ewaste_recommendation: string;
-    created_at: string;
-  }>;
 }
 
 export interface AnalysesResponse {
   analyses: AnalysisRecord[];
   limit: number;
   offset: number;
-  count: number;
+  total: number;
 }
 
 export async function getAdminStats(): Promise<AdminStats> {
@@ -83,6 +78,19 @@ export async function getAdminAnalyses(limit: number = 100, offset: number = 0):
     throw new Error(`Failed to fetch analyses (${res.status})`);
   }
   return (await res.json()) as AnalysesResponse;
+}
+
+export async function getAllAdminAnalyses(): Promise<AnalysisRecord[]> {
+  const pageSize = 200;
+  const firstPage = await getAdminAnalyses(pageSize, 0);
+  const analyses = [...firstPage.analyses];
+
+  for (let offset = pageSize; offset < firstPage.total; offset += pageSize) {
+    const page = await getAdminAnalyses(pageSize, offset);
+    analyses.push(...page.analyses);
+  }
+
+  return analyses;
 }
 
 export async function getAdminAnalytics(): Promise<AdminAnalytics> {

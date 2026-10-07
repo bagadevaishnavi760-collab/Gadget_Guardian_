@@ -1,12 +1,20 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import json
 import joblib
 import numpy as np
 import pandas as pd
 import os
+import sqlite3
+
+from analysis_store import get_analyses, get_analytics, get_stats, initialize_database, save_analysis
 
 app = Flask(__name__)
 CORS(app)
+app.config["DATABASE_PATH"] = os.environ.get(
+    "ANALYSES_DB_PATH", os.path.join(os.path.dirname(__file__), "analyses.db")
+)
+initialize_database(app.config["DATABASE_PATH"])
 
 # Load the model
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "gadget_lifespan_linear_regression_model.pkl")
@@ -292,6 +300,7 @@ def predict():
             "model": "Multiple Linear Regression (real model)",
         }
 
+        save_analysis(app.config["DATABASE_PATH"], data, response)
         return jsonify(response)
 
     except Exception as e:
@@ -299,6 +308,42 @@ def predict():
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/admin/stats", methods=["GET"])
+def admin_stats():
+    try:
+        return jsonify(get_stats(app.config["DATABASE_PATH"]))
+    except sqlite3.Error:
+        app.logger.exception("Unable to read analysis statistics")
+        return jsonify({"error": "Unable to read analysis statistics"}), 500
+
+
+@app.route("/admin/analyses", methods=["GET"])
+def admin_analyses():
+    try:
+        limit = int(request.args.get("limit", 50))
+        offset = int(request.args.get("offset", 0))
+    except ValueError:
+        return jsonify({"error": "limit and offset must be integers"}), 400
+
+    if limit < 1 or limit > 200 or offset < 0:
+        return jsonify({"error": "limit must be 1-200 and offset must be non-negative"}), 400
+
+    try:
+        return jsonify(get_analyses(app.config["DATABASE_PATH"], limit, offset))
+    except (sqlite3.Error, json.JSONDecodeError):
+        app.logger.exception("Unable to read analyses")
+        return jsonify({"error": "Unable to read analyses"}), 500
+
+
+@app.route("/admin/analytics", methods=["GET"])
+def admin_analytics():
+    try:
+        return jsonify(get_analytics(app.config["DATABASE_PATH"]))
+    except sqlite3.Error:
+        app.logger.exception("Unable to read analysis analytics")
+        return jsonify({"error": "Unable to read analysis analytics"}), 500
 
 
 @app.route("/health", methods=["GET"])

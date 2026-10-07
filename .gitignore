@@ -43,4 +43,5 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+backend/analyses.db
 test_api.py
