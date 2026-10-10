@@ -26,8 +26,8 @@ export function getHistory(): AnalysisRecord[] {
 
 export function saveAnalysis(input: GadgetInput, result: PredictionResult): AnalysisRecord {
   const record: AnalysisRecord = {
-    id: `${Date.now()}`,
-    date: new Date().toISOString(),
+    id: result.record_id ?? `${Date.now()}`,
+    date: result.created_at ?? new Date().toISOString(),
     input,
     result,
   };

@@ -212,3 +212,52 @@ Possible future improvements include:
 Gadget Guardian
 Smart E-Waste Management and Gadget Lifespan Prediction System Using Machine Learning
 Developed as an academic machine learning and web application project.
+
+## Local setup, persistence, and deployment
+
+Install frontend dependencies with `npm install`, copy `.env.example` to
+`.env`, and set `VITE_API_BASE_URL` to the Flask service. Vite development
+automatically uses `http://127.0.0.1:5000` when this variable is blank; for a
+production build it must be set to the deployed Flask origin. The frontend requires Flask by default;
+`VITE_USE_MOCK=true` is only an intentional offline UI demo and does not
+produce real ML results.
+
+Start the backend from `backend/` with:
+
+```text
+<project-root>\.venv\Scripts\python.exe app.py
+```
+
+The command must run with `backend/` as its working directory (or use an
+equivalent WSGI configuration such as `gunicorn --chdir backend app:app`), so
+the local `database` module and model file resolve correctly. The Flask
+development server uses port 5000 by default and honors `PORT` when hosted.
+
+The backend loads the existing
+`gadget_lifespan_linear_regression_model.pkl` without retraining or replacing
+it. `POST /predict` preserves the existing request and response fields and
+now saves every successful prediction to SQLite with a unique ID and UTC
+timestamp. Configure the database path with `GADGET_GUARDIAN_DATABASE`.
+
+Admin read APIs are available at `/admin/summary`, `/admin/records`,
+`/admin/analytics`, and `/admin/model-metrics`. They require the
+`X-Admin-Token` header matching the backend-only `ADMIN_API_TOKEN` environment
+variable. The `/admin` UI does not claim to authenticate users; it asks for
+this server-configured token and keeps it only in session storage. If the
+token is not configured, the server returns an explicit configuration error.
+Configure `CORS_ORIGINS` with exact trusted frontend origins rather than
+using the wildcard in production.
+
+MAE, MSE, RMSE, and R² are intentionally shown as unavailable until verified
+evaluation outputs are supplied in `backend/model_metrics.json`. Recommendation
+counts are inferred opportunities, not measured e-waste saved or environmental
+impact.
+
+SQLite is suitable for local development and persists across backend restarts,
+but should not be used as a writable database on a Vercel/serverless
+filesystem. Deploy Flask separately on a managed Python/container host and
+use managed PostgreSQL for production. In the frontend hosting provider,
+set the build-time variable `VITE_API_BASE_URL` to the complete deployed
+backend origin, for example `https://api.example.com` (without `/predict`).
+Redeploy the frontend after changing it because Vite embeds `VITE_*` values at
+build time. Do not leave localhost URLs in production configuration.

@@ -4,9 +4,12 @@ import {
   AlertTriangle,
   ArrowRight,
   CalendarClock,
+  Check,
+  CircleGauge,
   HeartPulse,
   Lightbulb,
   Recycle,
+  Sparkles,
   ShieldCheck,
   Wrench,
 } from "lucide-react";
@@ -31,14 +34,6 @@ export const Route = createFileRoute("/results")({
   }),
   component: ResultsPage,
 });
-
-const categoryTone: Record<string, string> = {
-  Excellent: "bg-primary/10 text-primary",
-  Good: "bg-accent text-accent-foreground",
-  Moderate: "bg-warning/15 text-warning",
-  Poor: "bg-destructive/10 text-destructive",
-  Critical: "bg-destructive/15 text-destructive",
-};
 
 const severityTone: Record<string, string> = {
   low: "bg-primary/10 text-primary",
@@ -112,7 +107,7 @@ function ResultsPage() {
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-12">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:justify-between">
           <div className="min-w-0">
-            <h1 className="truncate text-3xl font-bold tracking-tight sm:text-4xl">{r.gadget_type} health report</h1>
+            <h1 className="truncate text-3xl font-bold tracking-tight sm:text-4xl">Your Gadget’s Action Plan</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Analyzed on {new Date(record.date).toLocaleString()} · {r.model}
             </p>
@@ -122,13 +117,26 @@ function ResultsPage() {
           </Button>
         </div>
 
+        <Card className="overflow-hidden rounded-2xl border-primary/20 bg-gradient-to-r from-primary/10 via-accent/40 to-transparent shadow-card">
+          <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="flex items-center gap-2 text-sm font-semibold text-primary"><Sparkles className="size-4" /> Recommended next step for your {r.gadget_type}</p>
+              <h2 className="mt-1 text-2xl font-bold">{r.ewaste_recommendation === "Continue Using" ? "Don’t replace it yet — get more life from your gadget." : r.ewaste_recommendation.includes("Repair") ? "Repair before replacing." : r.ewaste_recommendation.includes("Refurbish") ? "Give your gadget a second life." : r.ewaste_recommendation.includes("Recycle") ? "Recycle responsibly." : "Pass it on to someone who needs it."}</h2>
+            </div>
+            <Button asChild className="rounded-xl"><Link to="/e-waste-guide">Explore the guide <ArrowRight className="size-4" /></Link></Button>
+          </CardContent>
+        </Card>
+
         <div className="grid gap-5 lg:grid-cols-3">
-          <Card className="rounded-2xl shadow-card">
-            <CardContent className="flex flex-col items-center p-6">
+          <Card className="rounded-3xl border-purple-200/70 bg-gradient-to-br from-white via-[#faf8ff] to-[#eee8ff] shadow-[0_18px_45px_-24px_rgba(109,76,170,0.55)]">
+            <CardContent className="flex flex-col items-center p-6 sm:p-7">
               <Gauge score={r.health_score} />
-              <span className={`mt-2 rounded-full px-3 py-1 text-xs font-semibold ${categoryTone[r.health_category]}`}>
+              <div className="mt-2 flex items-center gap-2 rounded-full border border-purple-200 bg-white/80 px-4 py-1.5 text-xs font-bold text-purple-700 shadow-sm">
+                <CircleGauge className="size-3.5" />
                 {r.health_category}
-              </span>
+                <span className="text-purple-300">•</span>
+                <span>{r.health_score}/100</span>
+              </div>
             </CardContent>
           </Card>
 
@@ -147,18 +155,33 @@ function ResultsPage() {
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl eco-gradient text-primary-foreground shadow-soft">
-            <CardContent className="p-6">
-              <span className="grid size-11 place-items-center rounded-xl bg-primary-foreground/15">
+          <Card className="rounded-3xl bg-gradient-to-br from-[#6f3cc3] via-[#8d4dc8] to-[#ee765f] text-white shadow-[0_18px_45px_-20px_rgba(141,77,200,0.75)]">
+            <CardContent className="relative overflow-hidden p-6 sm:p-7">
+              <span className="pointer-events-none absolute -right-8 -top-10 size-32 rounded-full bg-white/10" />
+              <span className="relative grid size-12 place-items-center rounded-2xl bg-white/20 shadow-inner">
                 <Recycle className="size-5" />
               </span>
-              <p className="mt-4 text-sm opacity-90">Final e-waste recommendation</p>
-              <p className="mt-1 text-2xl font-bold leading-snug">{r.ewaste_recommendation}</p>
+              <p className="relative mt-5 text-sm font-medium text-white/80">Final e-waste recommendation</p>
+              <div className="relative mt-2 flex items-center gap-2">
+                <span className="grid size-6 place-items-center rounded-full bg-white/20"><Check className="size-3.5" /></span>
+                <p className="text-2xl font-bold leading-snug">{r.ewaste_recommendation}</p>
+              </div>
               <Button asChild variant="secondary" size="sm" className="mt-5 rounded-xl">
                 <Link to="/e-waste-guide">See the e-waste guide</Link>
               </Button>
             </CardContent>
           </Card>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold tracking-tight">Do These 3 Things First</h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            {r.maintenance_recommendations.slice(0, 3).map((item, index) => (
+              <Card key={item} className="rounded-2xl shadow-card">
+                <CardContent className="p-5"><span className="grid size-8 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">{index + 1}</span><p className="mt-4 text-sm font-medium leading-relaxed">{item}</p></CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
         <Card className="rounded-2xl shadow-card">
@@ -208,37 +231,43 @@ function ResultsPage() {
           </div>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-2">
-          <Card className="rounded-2xl shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Wrench className="size-4 text-primary" /> Maintenance recommendations
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card className="rounded-3xl border-purple-100 bg-gradient-to-br from-white to-[#f7f2ff] shadow-[0_16px_40px_-24px_rgba(109,76,170,0.55)]">
+            <CardHeader className="border-b border-purple-100/80 pb-5">
+              <CardTitle className="flex items-center gap-3 text-lg">
+                <span className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-purple-600 to-fuchsia-500 text-white shadow-lg shadow-purple-200">
+                  <Wrench className="size-5" />
+                </span>
+                <span><span className="block">Maintenance recommendations</span><span className="mt-1 block text-xs font-normal text-muted-foreground">Small actions that protect your health score.</span></span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <ul className="space-y-3">
                 {r.maintenance_recommendations.map((m) => (
-                  <li key={m} className="flex gap-3 text-sm text-muted-foreground">
-                    <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-                    <span>{m}</span>
+                  <li key={m} className="group flex items-start gap-3 rounded-2xl border border-purple-100 bg-white/80 p-3.5 text-sm text-muted-foreground shadow-sm transition-transform hover:-translate-y-0.5">
+                    <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-xl bg-purple-100 text-purple-700 group-hover:bg-purple-600 group-hover:text-white"><ShieldCheck className="size-4" /></span>
+                    <span className="pt-1 leading-relaxed">{m}</span>
                   </li>
                 ))}
               </ul>
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Lightbulb className="size-4 text-primary" /> Ways to extend device lifespan
+          <Card className="rounded-3xl border-orange-100 bg-gradient-to-br from-white to-[#fff5f0] shadow-[0_16px_40px_-24px_rgba(238,118,95,0.55)]">
+            <CardHeader className="border-b border-orange-100/80 pb-5">
+              <CardTitle className="flex items-center gap-3 text-lg">
+                <span className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-orange-400 to-rose-500 text-white shadow-lg shadow-orange-200">
+                  <Lightbulb className="size-5" />
+                </span>
+                <span><span className="block">Ways to extend device lifespan</span><span className="mt-1 block text-xs font-normal text-muted-foreground">Premium habits for more useful months.</span></span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {r.lifespan_extension_tips.map((t) => (
-                  <li key={t} className="flex gap-3 text-sm text-muted-foreground">
-                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                    <span>{t}</span>
+            <CardContent className="pt-6">
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                {r.lifespan_extension_tips.map((t, index) => (
+                  <li key={t} className="group flex items-start gap-3 rounded-2xl border border-orange-100 bg-white/80 p-3.5 text-sm text-muted-foreground shadow-sm transition-transform hover:-translate-y-0.5">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-orange-100 to-rose-100 text-xs font-bold text-orange-700 group-hover:from-orange-400 group-hover:to-rose-500 group-hover:text-white">{index + 1}</span>
+                    <span className="pt-1 leading-relaxed">{t}</span>
                   </li>
                 ))}
               </ul>
@@ -246,23 +275,39 @@ function ResultsPage() {
           </Card>
         </div>
 
-        <Card className="rounded-2xl border-primary/25 bg-surface shadow-card">
-          <CardHeader>
-            <CardTitle className="text-base">Why this recommendation?</CardTitle>
+        <Card className="overflow-hidden rounded-3xl border-purple-200/70 bg-gradient-to-br from-[#f7f2ff] via-white to-[#fff4ef] shadow-[0_18px_48px_-25px_rgba(109,76,170,0.5)]">
+          <CardHeader className="border-b border-purple-100/70 pb-5">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <span className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-violet-600 to-orange-400 text-white shadow-lg shadow-violet-200"><Sparkles className="size-5" /></span>
+              <span><span className="block">Why this recommendation?</span><span className="mt-1 block text-xs font-normal text-muted-foreground">A clear, data-led explanation of your action plan.</span></span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <ol className="space-y-3">
+          <CardContent className="p-6 sm:p-7">
+            <ol className="grid gap-4 md:grid-cols-2">
               {r.reasoning.map((line, i) => (
-                <li key={line} className="flex gap-3 text-sm text-muted-foreground">
-                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                <li key={line} className="flex gap-4 rounded-2xl border border-white/80 bg-white/75 p-4 text-sm text-muted-foreground shadow-sm">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-purple-600 to-fuchsia-500 text-sm font-bold text-white shadow-md shadow-purple-200">
                     {i + 1}
                   </span>
-                  <span>{line}</span>
+                  <span className="pt-1 leading-relaxed">{line}</span>
                 </li>
               ))}
             </ol>
           </CardContent>
         </Card>
+
+        <div>
+          <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight"><Lightbulb className="size-5 text-warning" /> Quick Wins</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {r.lifespan_extension_tips.slice(0, 3).map((tip) => <div key={tip} className="rounded-xl border border-border bg-surface p-4 text-sm text-muted-foreground">{tip}</div>)}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <Button asChild className="rounded-xl"><Link to="/analyze">Analyze Another Gadget <ArrowRight className="size-4" /></Link></Button>
+          <Button asChild variant="outline" className="rounded-xl"><Link to="/dashboard">View Dashboard</Link></Button>
+          <Button asChild variant="outline" className="rounded-xl"><Link to="/e-waste-guide">E-Waste Guide</Link></Button>
+        </div>
       </div>
     </SiteLayout>
   );

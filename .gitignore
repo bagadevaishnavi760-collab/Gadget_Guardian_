@@ -43,4 +43,5 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+*.sqlite3
 test_api.py

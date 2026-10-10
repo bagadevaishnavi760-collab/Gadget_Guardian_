@@ -1,9 +1,8 @@
 /**
  * API service layer.
  *
- * The real prediction will be served by a Python (Flask / FastAPI) backend
- * exposing POST /predict. Until that backend is connected, `predictGadget`
- * falls back to a mock response so the interface is fully usable.
+ * The Flask service is required by default. Set VITE_USE_MOCK=true only for
+ * an intentional offline UI demo.
  *
  * IMPORTANT: no real ML logic lives in the frontend on purpose.
  */
@@ -56,15 +55,22 @@ export interface PredictionResult {
   reasoning: string[];
   factor_breakdown: { factor: string; impact: number }[];
   model: string;
+  record_id?: string;
+  created_at?: string;
 }
 
-const API_BASE_URL = import.meta.env["VITE_API_BASE_URL"] ?? "";
-const USE_MOCK = !API_BASE_URL;
+const configuredApiBaseUrl = (import.meta.env["VITE_API_BASE_URL"] ?? "").trim();
+const API_BASE_URL = (configuredApiBaseUrl || (import.meta.env.DEV ? "http://127.0.0.1:5000" : "")).replace(/\/$/, "");
+const USE_MOCK = import.meta.env["VITE_USE_MOCK"] === "true";
 
 export async function predictGadget(input: GadgetInput): Promise<PredictionResult> {
   if (USE_MOCK) {
     await new Promise((r) => setTimeout(r, 900));
     return mockPredict(input);
+  }
+
+  if (!API_BASE_URL) {
+    throw new Error("Prediction service is not configured. Set VITE_API_BASE_URL to the deployed Flask backend URL.");
   }
 
   const res = await fetch(`${API_BASE_URL}/predict`, {
@@ -73,12 +79,54 @@ export async function predictGadget(input: GadgetInput): Promise<PredictionResul
     body: JSON.stringify(input),
   });
 
-  if (!res.ok) {
-    throw new Error(`Prediction failed (${res.status})`);
-  }
-
-  return (await res.json()) as PredictionResult;
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(payload.error ?? `Prediction failed (${res.status})`);
+  return payload as PredictionResult;
 }
+
+export interface AnalysisRecordLike {
+  id: string;
+  date: string;
+  input: GadgetInput;
+  result: PredictionResult;
+}
+
+export interface AdminSummary {
+  total_analyses: number;
+  total_predictions: number;
+  average_health_score: number | null;
+  gadget_types: { label: string; count: number }[];
+  health_categories: { label: string; count: number }[];
+  recommendations: { label: string; count: number }[];
+  recent: AnalysisRecordLike[];
+}
+
+export interface AdminRecordsResponse {
+  records: AnalysisRecordLike[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
+export interface ModelMetricsResponse {
+  configured: boolean;
+  message?: string;
+  metrics?: { mae?: number; mse?: number; rmse?: number; r2?: number };
+}
+
+async function adminFetch<T>(path: string, token: string): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, { headers: { "X-Admin-Token": token } });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error ?? `Admin request failed (${response.status})`);
+  return payload as T;
+}
+
+export const getAdminSummary = (token: string) => adminFetch<AdminSummary>("/admin/summary", token);
+export const getAdminAnalytics = (token: string) =>
+  adminFetch<AdminSummary & { lifespan: { value: number; count: number }[] }>("/admin/analytics", token);
+export const getAdminRecords = (token: string, query = "") =>
+  adminFetch<AdminRecordsResponse>(`/admin/records${query}`, token);
+export const getModelMetrics = (token: string) => adminFetch<ModelMetricsResponse>("/admin/model-metrics", token);
 
 /* ---------------------------------------------------------------------------
  * Mock backend stand-in. Replace by pointing VITE_API_BASE_URL at the Python

@@ -4,13 +4,19 @@ import joblib
 import numpy as np
 import pandas as pd
 import os
+import secrets
+import uuid
+
+from database import analytics, init_db, list_predictions, save_prediction, summary
 
 app = Flask(__name__)
-CORS(app)
+allowed_origins = [origin.strip() for origin in os.environ.get("CORS_ORIGINS", "").split(",") if origin.strip()]
+CORS(app, origins=allowed_origins or "*")
 
 # Load the model
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "gadget_lifespan_linear_regression_model.pkl")
 model = joblib.load(MODEL_PATH)
+init_db()
 
 print("Model loaded successfully!")
 print(f"Model type: {type(model)}")
@@ -35,6 +41,50 @@ def map_frontend_to_model(frontend_data):
         "Environment_Stress": frontend_data["environmental_stress"],
         "Expected_Life_Months": frontend_data["expected_life_months"],
     }
+
+
+REQUIRED_FIELDS = {
+    "gadget_type", "age_years", "daily_usage_hours", "battery_health",
+    "charge_cycles", "overheating_level", "physical_condition",
+    "maintenance_frequency", "repair_count", "performance_score",
+    "storage_used", "software_updated", "environmental_stress",
+    "expected_life_months",
+}
+GADGET_TYPES = {"Laptop", "Smartphone", "Tablet", "Smartwatch"}
+
+
+def validate_input(data):
+    if not isinstance(data, dict):
+        raise ValueError("Request body must be a JSON object.")
+    missing = REQUIRED_FIELDS - data.keys()
+    if missing:
+        raise ValueError(f"Missing required fields: {', '.join(sorted(missing))}.")
+    if data["gadget_type"] not in GADGET_TYPES:
+        raise ValueError("Unsupported gadget type.")
+    numeric_ranges = {
+        "age_years": (0, 25), "daily_usage_hours": (0, 24), "battery_health": (0, 100),
+        "charge_cycles": (0, 5000), "overheating_level": (1, 5),
+        "physical_condition": (1, 5), "maintenance_frequency": (1, 5),
+        "repair_count": (0, 50), "performance_score": (0, 100),
+        "storage_used": (0, 100), "environmental_stress": (1, 5),
+        "expected_life_months": (6, 240),
+    }
+    for field, (minimum, maximum) in numeric_ranges.items():
+        value = data[field]
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not minimum <= value <= maximum:
+            raise ValueError(f"{field} must be between {minimum} and {maximum}.")
+    if not isinstance(data["software_updated"], bool):
+        raise ValueError("software_updated must be a boolean.")
+
+
+def admin_required():
+    configured_token = os.environ.get("ADMIN_API_TOKEN")
+    if not configured_token:
+        return jsonify({"error": "Admin API is not configured. Set ADMIN_API_TOKEN on the backend."}), 503
+    supplied = request.headers.get("X-Admin-Token", "")
+    if not secrets.compare_digest(supplied, configured_token):
+        return jsonify({"error": "Admin authentication required."}), 401
+    return None
 
 
 def calculate_health_score(i):
@@ -248,7 +298,8 @@ def calculate_reasoning(i, score, remaining, category, action, risks):
 def predict():
     """Predict gadget lifespan using the ML model."""
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
+        validate_input(data)
 
         # Map frontend field names to model feature names
         model_input = map_frontend_to_model(data)
@@ -269,8 +320,8 @@ def predict():
         ewaste_recommendation = calculate_ewaste_recommendation(health_score)
         factor_breakdown = calculate_factor_breakdown(i)
 
-        # Calculate remaining months (clamped to expected life)
-        remaining = max(0, min(i["expected_life_months"], round((i["expected_life_months"] - i["age_years"] * 12) * (health_score / 100) * 1.05)))
+        # Use the persisted model output as the lifespan prediction.
+        remaining = max(0, min(i["expected_life_months"], round(float(predicted_months), 1)))
         remaining_years = round((remaining / 12) * 10) / 10
 
         # Generate reasoning
@@ -292,13 +343,68 @@ def predict():
             "model": "Multiple Linear Regression (real model)",
         }
 
+        record = save_prediction(str(uuid.uuid4()), data, response)
+        response["record_id"] = record["id"]
+        response["created_at"] = record["date"]
         return jsonify(response)
 
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
-        print(f"Error in prediction: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+        app.logger.exception("Prediction failed")
+        return jsonify({"error": "Prediction service failed."}), 500
+
+
+@app.route("/admin/summary", methods=["GET"])
+def admin_summary():
+    auth_error = admin_required()
+    if auth_error:
+        return auth_error
+    return jsonify(summary())
+
+
+@app.route("/admin/analytics", methods=["GET"])
+def admin_analytics():
+    auth_error = admin_required()
+    if auth_error:
+        return auth_error
+    return jsonify(analytics())
+
+
+@app.route("/admin/records", methods=["GET"])
+def admin_records():
+    auth_error = admin_required()
+    if auth_error:
+        return auth_error
+    try:
+        page = max(1, int(request.args.get("page", 1)))
+        per_page = min(100, max(1, int(request.args.get("per_page", 20))))
+    except ValueError:
+        return jsonify({"error": "page and per_page must be integers."}), 400
+    records, total = list_predictions(
+        search=request.args.get("search", ""),
+        gadget_type=request.args.get("gadget_type", ""),
+        health_category=request.args.get("health_category", ""),
+        recommendation=request.args.get("recommendation", ""),
+        sort=request.args.get("sort", "created_at"),
+        direction=request.args.get("direction", "desc"),
+        page=page,
+        per_page=per_page,
+    )
+    return jsonify({"records": records, "total": total, "page": page, "per_page": per_page})
+
+
+@app.route("/admin/model-metrics", methods=["GET"])
+def admin_model_metrics():
+    auth_error = admin_required()
+    if auth_error:
+        return auth_error
+    metrics_path = os.path.join(os.path.dirname(__file__), "model_metrics.json")
+    if not os.path.exists(metrics_path):
+        return jsonify({"configured": False, "message": "Verified evaluation metrics have not been configured."})
+    import json
+    with open(metrics_path, encoding="utf-8") as metrics_file:
+        return jsonify({"configured": True, "metrics": json.load(metrics_file)})
 
 
 @app.route("/health", methods=["GET"])
@@ -308,4 +414,8 @@ def health():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", "5000")),
+        debug=os.environ.get("FLASK_DEBUG", "").lower() == "true",
+    )
